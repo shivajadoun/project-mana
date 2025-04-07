@@ -1,0 +1,32 @@
+import React from 'react';
+import Home from './pages/Home/Home';
+import './App.css';
+import Navbar from './pages/Navbar/Navbar';
+import { Route, Routes } from 'react-router-dom';
+import IssueDetails from './pages/IssueDetails/IssueDetails';
+import ProjectDetails from './pages/ProjectDetails/ProjectDetails';
+import Subscription from './pages/Subscription/Subscription'; // fixed import
+import Auth from './pages/Auth/Auth';
+
+function App() {
+  return (
+    <>{
+ true?<div>
+
+        
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/project/:id" element={<ProjectDetails />} />
+            <Route path="/project/:projectId/issue/:issueId" element={<IssueDetails />} />
+            <Route path="/upgrade_plan" element={<Subscription />} />
+          </Routes>
+       
+     </div>:<Auth/>
+    }
+
+    </>
+  );
+}
+
+export default App;
