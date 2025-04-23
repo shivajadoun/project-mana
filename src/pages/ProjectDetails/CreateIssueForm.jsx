@@ -2,11 +2,14 @@ import { Button } from '@/components/ui/button';
 import { DialogClose } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { createIssue } from '@/Redux/Issue/Action';
 
 import React from 'react'
 import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
 
 const CreateIssueForm = () => {
+  const dispatch=useDispatch();
      const form = useForm({
         defaultValues: {
           issueName: "",
@@ -16,6 +19,7 @@ const CreateIssueForm = () => {
     
       // Handle form submission
       const onSubmit = (data) => {
+        dispatch(createIssue(data))
         console.log("Create project data:", data);
       };
     
