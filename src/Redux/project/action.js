@@ -23,7 +23,6 @@ export const searchProjects=(keyword) =>async (dispatch)=>{
     }
 }
 
-
 export const createProjects=(projectData) =>async (dispatch)=>{
     dispatch({type:CREATE_PROJECT_REQUEST})
     try{
@@ -35,20 +34,16 @@ export const createProjects=(projectData) =>async (dispatch)=>{
     }
 }
 
-
-
 export const fetchProjectById=(id) =>async (dispatch)=>{
-    dispatch({type:FETCH_PROJECT_BY_ID_REQUEST})
+    dispatch({ type:FETCH_PROJECT_BY_ID_REQUEST})
     try{
-        const{data}=await api.get("/api/projects"+id)
+        const{data}=await api.get("/api/projects/"+id)
         console.log("all projects",data)
         dispatch({type: FETCH_PROJECT_BY_ID_SUCCESS,project:data})
     }catch(error){
             console.log("error",error);
     }
 }
-
-
 
 export const deleteProject=({projectId}) =>async (dispatch)=>{
     dispatch({type:DELETE_PROJECT_REQUEST})
@@ -61,8 +56,6 @@ export const deleteProject=({projectId}) =>async (dispatch)=>{
     }
 }
 
-
-
 export const inviteToProject=({email,projectId}) =>async (dispatch)=>{
     dispatch({type:INVITE_TO_PROJECT_SUCCESS})
     try{
@@ -73,7 +66,6 @@ export const inviteToProject=({email,projectId}) =>async (dispatch)=>{
             console.log("error",error);
     }
 }
-
 
 export const acceptInviteation=({inviationToken,navigate}) =>async (dispatch)=>{
     dispatch({type:ACCEPT_INVITATION_SUCCESS})

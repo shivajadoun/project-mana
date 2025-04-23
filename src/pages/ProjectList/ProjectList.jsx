@@ -7,6 +7,9 @@ import { ScrollArea } from '@radix-ui/react-scroll-area';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import ProjectCard from '../Project/ProjectCard';
+import { useDispatch, useSelector } from 'react-redux';
+import { searchProjects } from '@/Redux/project/action';
+import { fetchProjects } from './Redux/project/action';
 
 export const tags = [
   { id: "t1", value: "all", label: "All" },
@@ -21,14 +24,29 @@ export const tags = [
 ];
 
 const ProjectList = () => {
+  const {project}=useSelector(state=>state);
   const [keyword, setKeyword] = useState("");
+  const dispatch=useDispatch();
 
-  const handleFilterChange = (section, value) => {
+  const handleFilterCateogory = (value) => {
+    if(value=="all"){
+      dispatch(fetchProjects({}))
+    }else{
+    dispatch(fetchProjects({category:value}))
+  }
     console.log("Selected filter:", section, value);
   };
-
+  const handleFilterTag = (value) => {
+    if(value=="all"){
+      dispatch(fetchProjects({}))
+    }else{
+    dispatch(fetchProjects({tag:value}))
+  }
+    console.log("Selected filter:", section, value);
+  };
   const handleSearchChange = (e) => {
     setKeyword(e.target.value);
+    dispatch(searchProjects(e.target.value))
   };
 
   return (
@@ -47,7 +65,7 @@ const ProjectList = () => {
                 <div>
                   <h1 className="pb-3 text-gray-400 border-b">Category</h1>
                   <div className="pt-5">
-                    <RadioGroup defaultValue="all" onValueChange={(value) => handleFilterChange("category", value)}>
+                    <RadioGroup defaultValue="all" onValueChange={(value) => handleFilterCateogory("category", value)}>
                       {[{ id: "r1", value: "all", label: "All" },
                         { id: "r2", value: "fullstack", label: "Fullstack" },
                         { id: "r3", value: "frontend", label: "Frontend" },
@@ -64,7 +82,7 @@ const ProjectList = () => {
                 <div>
                   <h1 className="pb-3 text-gray-400 border-b">Tags</h1>
                   <div className="pt-5">
-                    <RadioGroup defaultValue="all" onValueChange={(value) => handleFilterChange("tags", value)}>
+                    <RadioGroup defaultValue="all" onValueChange={(value) => handleFilterTag(value)}>
                       {tags.map(({ id, value, label }) => (
                         <div key={id} className="flex items-center gap-2">
                           <RadioGroupItem className="custom-radio bg-white" value={value} id={id} />
@@ -92,8 +110,8 @@ const ProjectList = () => {
 
           {/* Project Cards Below Search Bar */}
           <div className="w-full mt-2 space-y-2">
-            {(keyword ? [1,1,1] : [1, 1, 1, 1]).map((item) => (
-              <ProjectCard key={item} />
+            {keyword ? project.searchProjects?.map(item=> <ProjectCard item={item} key={item.id*index}/>) : project.projects.map((item) => (
+              <ProjectCard key={item.id} item={item} />
             ))}
           </div>
         </div>

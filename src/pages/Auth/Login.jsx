@@ -1,9 +1,12 @@
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { login } from '@/Redux/Auth/Action';
 import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
 
 const Login = () => {
+  const dispatch=useDispatch()
   const form = useForm({
     defaultValues: {
       email: '',
@@ -12,6 +15,7 @@ const Login = () => {
   });
 
   const onSubmit = (data) => {
+    dispatch(login(data))
     console.log('Login data:', data);
   };
 

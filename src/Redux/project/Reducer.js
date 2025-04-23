@@ -29,7 +29,7 @@ export const projectReducer=(state=initialState,action)=>{
                 return {
                     ...state,
                     loading:false,
-                    searchProjects : action.payload,
+                    searchProjects : action.projects,
                     error:null
                 };
 
@@ -52,7 +52,7 @@ export const projectReducer=(state=initialState,action)=>{
                         return {
                             ...state,
                             loading:false,
-                            projects : state.projects.filter(project=>project.id===action.projectId),
+                            projects : state.projects.filter(project=>project.id !== action.projectId),
                             error:null
                         };
 
