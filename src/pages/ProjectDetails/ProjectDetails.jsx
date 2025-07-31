@@ -28,7 +28,7 @@ const ProjectDetails = () => {
           <ScrollArea className="h-screen lg:w-[75%] pr-2">
             <div className="text-gray-400 pb-10 w-full">
               <h1 className="text-lg font-semibold pb-5">
-                {project.projectDetails?.name}
+                {project.projectDetails?.projectName}
               </h1>
 
               <div className="space-y-5 pb-10 text-sm">
