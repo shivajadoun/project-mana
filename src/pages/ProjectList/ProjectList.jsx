@@ -24,8 +24,11 @@ export const tags = [
 ];
 
 const ProjectList = () => {
-  const { project } = useSelector(state => state);
+  // Fix the selector - specify the exact state you need
+  const { projects, searchProjects: searchResults, loading, error } = useSelector(state => state.project);
   const [keyword, setKeyword] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedTag, setSelectedTag] = useState("all");
   const dispatch = useDispatch();
 
   // Load projects on component mount
@@ -33,7 +36,10 @@ const ProjectList = () => {
     dispatch(fetchProjects({}));
   }, [dispatch]);
 
-  const handleFilterCateogory = (value) => {
+  const handleFilterCategory = (value) => {
+    setSelectedCategory(value);
+    setKeyword(""); // Clear search when filtering
+    
     if (value === "all") {
       dispatch(fetchProjects({}));
     } else {
@@ -43,6 +49,9 @@ const ProjectList = () => {
   };
 
   const handleFilterTag = (value) => {
+    setSelectedTag(value);
+    setKeyword(""); // Clear search when filtering
+    
     if (value === "all") {
       dispatch(fetchProjects({}));
     } else {
@@ -54,7 +63,12 @@ const ProjectList = () => {
   const handleSearchChange = (e) => {
     const searchValue = e.target.value;
     setKeyword(searchValue);
-    if (searchValue) {
+    
+    // Reset filters when searching
+    setSelectedCategory("all");
+    setSelectedTag("all");
+    
+    if (searchValue.trim()) {
       dispatch(searchProjects(searchValue));
     } else {
       dispatch(fetchProjects({}));
@@ -62,7 +76,7 @@ const ProjectList = () => {
   };
 
   // Add error handling and loading states
-  if (project?.loading) {
+  if (loading) {
     return (
       <div className="flex justify-center items-center py-20">
         <div className="text-white">Loading projects...</div>
@@ -70,18 +84,23 @@ const ProjectList = () => {
     );
   }
 
-  if (project?.error) {
+  if (error) {
     return (
       <div className="flex justify-center items-center py-20">
-        <div className="text-red-500">Error loading projects: {project.error}</div>
+        <div className="text-red-500">Error loading projects: {error}</div>
       </div>
     );
   }
 
   // Safely get projects array
-  const projectsToShow = keyword 
-    ? (project?.searchProjects || []) 
-    : (project?.projects || []);
+  const projectsToShow = keyword.trim() 
+    ? (searchResults || []) 
+    : (projects || []);
+
+  console.log("Projects to show:", projectsToShow);
+  console.log("Keyword:", keyword);
+  console.log("Search results:", searchResults);
+  console.log("All projects:", projects);
 
   return (
     <div className="relative px-5 lg:px-0 flex gap-10 justify-center py-5">
@@ -99,7 +118,7 @@ const ProjectList = () => {
                 <div>
                   <h1 className="pb-3 text-gray-400 border-b">Category</h1>
                   <div className="pt-5">
-                    <RadioGroup defaultValue="all" onValueChange={handleFilterCateogory}>
+                    <RadioGroup value={selectedCategory} onValueChange={handleFilterCategory}>
                       {[{ id: "r1", value: "all", label: "All" },
                         { id: "r2", value: "fullstack", label: "Fullstack" },
                         { id: "r3", value: "frontend", label: "Frontend" },
@@ -116,7 +135,7 @@ const ProjectList = () => {
                 <div>
                   <h1 className="pb-3 text-gray-400 border-b">Tags</h1>
                   <div className="pt-5">
-                    <RadioGroup defaultValue="all" onValueChange={handleFilterTag}>
+                    <RadioGroup value={selectedTag} onValueChange={handleFilterTag}>
                       {tags.map(({ id, value, label }) => (
                         <div key={id} className="flex items-center gap-2">
                           <RadioGroupItem className="custom-radio bg-white" value={value} id={id} />
@@ -145,13 +164,13 @@ const ProjectList = () => {
 
           {/* Project Cards Below Search Bar */}
           <div className="w-full mt-2 space-y-2">
-            {projectsToShow.length > 0 ? (
+            {projectsToShow && projectsToShow.length > 0 ? (
               projectsToShow.map((item, index) => (
-                <ProjectCard key={item?.id || index} item={item} />
+                <ProjectCard key={item?.id || `project-${index}`} item={item} />
               ))
             ) : (
               <div className="text-center text-gray-400 py-8">
-                {keyword ? "No projects found matching your search" : "No projects available"}
+                {keyword.trim() ? "No projects found matching your search" : "No projects available"}
               </div>
             )}
           </div>
