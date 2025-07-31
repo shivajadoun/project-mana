@@ -9,7 +9,7 @@ import Subscription from './pages/Subscription/Subscription'; // fixed import
 import Auth from './pages/Auth/Auth';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUser } from './Redux/Auth/Action';
-import { fetchProjects } from './Redux/project/action';
+import { fetchProjects } from '@/Redux/project/action';
 
 
 function App() {

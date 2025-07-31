@@ -1,6 +1,7 @@
 import axios from "axios"
 
-export const API_BASE_URL="http://localhost:8080"
+// In your config/api.js file, it should be:
+export const API_BASE_URL = "http://localhost:8080"; // or whatever port your Spring Boot runs on
 
 const api=axios.create({baseURL:API_BASE_URL})
 

@@ -1,5 +1,5 @@
 // src/Project/ProjectList.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MixerHorizontalIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons';
@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import ProjectCard from '../Project/ProjectCard';
 import { useDispatch, useSelector } from 'react-redux';
 import { searchProjects } from '@/Redux/project/action';
-import { fetchProjects } from './Redux/project/action';
+import { fetchProjects } from '@/Redux/project/action';
 
 export const tags = [
   { id: "t1", value: "all", label: "All" },
@@ -24,30 +24,64 @@ export const tags = [
 ];
 
 const ProjectList = () => {
-  const {project}=useSelector(state=>state);
+  const { project } = useSelector(state => state);
   const [keyword, setKeyword] = useState("");
-  const dispatch=useDispatch();
+  const dispatch = useDispatch();
+
+  // Load projects on component mount
+  useEffect(() => {
+    dispatch(fetchProjects({}));
+  }, [dispatch]);
 
   const handleFilterCateogory = (value) => {
-    if(value=="all"){
-      dispatch(fetchProjects({}))
-    }else{
-    dispatch(fetchProjects({category:value}))
-  }
-    console.log("Selected filter:", section, value);
+    if (value === "all") {
+      dispatch(fetchProjects({}));
+    } else {
+      dispatch(fetchProjects({ category: value }));
+    }
+    console.log("Selected category filter:", value);
   };
+
   const handleFilterTag = (value) => {
-    if(value=="all"){
-      dispatch(fetchProjects({}))
-    }else{
-    dispatch(fetchProjects({tag:value}))
-  }
-    console.log("Selected filter:", section, value);
+    if (value === "all") {
+      dispatch(fetchProjects({}));
+    } else {
+      dispatch(fetchProjects({ tag: value }));
+    }
+    console.log("Selected tag filter:", value);
   };
+
   const handleSearchChange = (e) => {
-    setKeyword(e.target.value);
-    dispatch(searchProjects(e.target.value))
+    const searchValue = e.target.value;
+    setKeyword(searchValue);
+    if (searchValue) {
+      dispatch(searchProjects(searchValue));
+    } else {
+      dispatch(fetchProjects({}));
+    }
   };
+
+  // Add error handling and loading states
+  if (project?.loading) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <div className="text-white">Loading projects...</div>
+      </div>
+    );
+  }
+
+  if (project?.error) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <div className="text-red-500">Error loading projects: {project.error}</div>
+      </div>
+    );
+  }
+
+  // Safely get projects array
+  const projectsToShow = keyword 
+    ? (project?.searchProjects || []) 
+    : (project?.projects || []);
 
   return (
     <div className="relative px-5 lg:px-0 flex gap-10 justify-center py-5">
@@ -65,7 +99,7 @@ const ProjectList = () => {
                 <div>
                   <h1 className="pb-3 text-gray-400 border-b">Category</h1>
                   <div className="pt-5">
-                    <RadioGroup defaultValue="all" onValueChange={(value) => handleFilterCateogory("category", value)}>
+                    <RadioGroup defaultValue="all" onValueChange={handleFilterCateogory}>
                       {[{ id: "r1", value: "all", label: "All" },
                         { id: "r2", value: "fullstack", label: "Fullstack" },
                         { id: "r3", value: "frontend", label: "Frontend" },
@@ -82,7 +116,7 @@ const ProjectList = () => {
                 <div>
                   <h1 className="pb-3 text-gray-400 border-b">Tags</h1>
                   <div className="pt-5">
-                    <RadioGroup defaultValue="all" onValueChange={(value) => handleFilterTag(value)}>
+                    <RadioGroup defaultValue="all" onValueChange={handleFilterTag}>
                       {tags.map(({ id, value, label }) => (
                         <div key={id} className="flex items-center gap-2">
                           <RadioGroupItem className="custom-radio bg-white" value={value} id={id} />
@@ -103,6 +137,7 @@ const ProjectList = () => {
             <input
               className="w-full pl-12 pr-4 py-2 text-lg border border-gray-700 rounded-md bg-black text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
               onChange={handleSearchChange}
+              value={keyword}
               placeholder="Search for a project..."
             />
             <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6" />
@@ -110,9 +145,15 @@ const ProjectList = () => {
 
           {/* Project Cards Below Search Bar */}
           <div className="w-full mt-2 space-y-2">
-            {keyword ? project.searchProjects?.map(item=> <ProjectCard item={item} key={item.id*index}/>) : project.projects.map((item) => (
-              <ProjectCard key={item.id} item={item} />
-            ))}
+            {projectsToShow.length > 0 ? (
+              projectsToShow.map((item, index) => (
+                <ProjectCard key={item?.id || index} item={item} />
+              ))
+            ) : (
+              <div className="text-center text-gray-400 py-8">
+                {keyword ? "No projects found matching your search" : "No projects available"}
+              </div>
+            )}
           </div>
         </div>
       </div>
